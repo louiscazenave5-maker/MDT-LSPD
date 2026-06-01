@@ -177,6 +177,18 @@ button:hover{opacity:.85}
   line-height:1.2;
 }
 
+.vehicle-badge{
+  display:inline-block;
+  background:#2e7d32;
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  padding:3px 7px;
+  border-radius:4px;
+  margin-bottom:5px;
+  line-height:1.2;
+}
+
 .footer-credit{
   position:fixed;
   bottom:10px;
@@ -512,6 +524,7 @@ async function createUnit(){
   if(!name) return;
 
   const radio = prompt("Fréquence radio :", "Fréquence 1") || "";
+  const vehicle = prompt("Véhicule :", "Scout") || "";
   const weapon = prompt("Armements séparés par des virgules :", "Arme de poing") || "";
 
   const { error } = await db.from("units").insert({
@@ -519,6 +532,7 @@ async function createUnit(){
     name:name,
     status:"10-8",
     radio:radio,
+    vehicle:vehicle,
     weapon:weapon
   });
 
@@ -550,11 +564,14 @@ async function editUnitInfo(unitId){
   const radio = prompt("Fréquence radio :", unit.radio || "");
   if(radio === null) return;
 
+  const vehicle = prompt("Véhicule :", unit.vehicle || "");
+  if(vehicle === null) return;
+
   const weapon = prompt("Armements séparés par des virgules :", unit.weapon || "");
   if(weapon === null) return;
 
   const { error } = await db.from("units")
-    .update({ radio, weapon })
+    .update({ radio, vehicle, weapon })
     .eq("id", unitId);
 
   if(error){
@@ -644,6 +661,7 @@ function renderBoard(){
 
       <div class="unit-info">
         <div class="radio-badge">${unit.radio || "Aucune fréquence"}</div>
+        <div class="vehicle-badge">${unit.vehicle || "Aucun véhicule"}</div>
 
         <div class="weapon-container">
           ${weaponsHtml || `<span class="weapon-badge">Aucun armement</span>`}
