@@ -57,14 +57,17 @@ button:hover{opacity:.85}
 
 .board{
   display:flex;
+  flex-wrap:wrap;
   gap:15px;
-  overflow-x:auto;
   padding:20px;
+  overflow-x:hidden;
+  align-items:flex-start;
 }
 
 .column{
   background:#1e293b;
-  min-width:300px;
+  width:300px;
+  min-height:250px;
   padding:15px;
   border-radius:12px;
 }
@@ -531,6 +534,7 @@ async function createUnit(){
     id:"unit_" + Date.now(),
     name:name,
     status:"10-8",
+    patrouille:patrouille,
     radio:radio,
     vehicle:vehicle,
     weapon:weapon
@@ -562,7 +566,7 @@ async function editUnitInfo(unitId){
   if(!unit) return;
 
     const name = prompt(
-    "Nom de la patrouille :",unit.name || "");
+    "Nom de la patrouille :",unit.patrouille || "");
   if(name === null) return;
 
   const radio = prompt("Fréquence radio :", unit.radio || "");
