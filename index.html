@@ -252,7 +252,36 @@ button:hover{opacity:.85}
   <div class="board" id="board"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+db.channel("mdt-sync")
+  .on("postgres_changes", { event:"*", schema:"public", table:"users" }, async () => {
+    await loadData();
+
+    if(currentUser){
+      const updatedUser = users.find(u => u.matricule === currentUser.matricule);
+      if(updatedUser) currentUser = updatedUser;
+
+      if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
+      if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
+    }
+  })
+  .on("postgres_changes", { event:"*", schema:"public", table:"units" }, async () => {
+    await loadData();
+
+    if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
+    if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
+  })
+  .subscribe();
+
+loadData();
+
+</script>
+
 <script>
+const SUPABASE_URL = "https://ytdpmoscnhoqcjhmpmue.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Me-K3HVx2w6ZwQUeLbeY8w_qGA5Cm72";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const DEFAULT_USERS = [
   {
     nom:"Williams",
@@ -278,19 +307,30 @@ const DEFAULT_USERS = [
   }
 ];
 
-let users = JSON.parse(localStorage.getItem("mdt_users"));
-
-if(!users){
-  users = DEFAULT_USERS;
-  localStorage.setItem("mdt_users", JSON.stringify(users));
-}
-
-let units = JSON.parse(localStorage.getItem("mdt_units")) || [];
+let users = [];
+let units = [];
 let currentUser = null;
 
-function saveData(){
-  localStorage.setItem("mdt_users", JSON.stringify(users));
-  localStorage.setItem("mdt_units", JSON.stringify(units));
+async function loadData(){
+  const usersRes = await db.from("users").select("*").order("id", { ascending:true });
+  const unitsRes = await db.from("units").select("*");
+
+  if(usersRes.error){
+    alert("Erreur chargement comptes : " + usersRes.error.message);
+    return;
+  }
+
+  if(unitsRes.error){
+    alert("Erreur chargement unités : " + unitsRes.error.message);
+    return;
+  }
+
+  users = usersRes.data || [];
+  units = unitsRes.data || [];
+}
+
+async function saveData(){
+  // Avec Supabase, chaque action sauvegarde directement dans la base.
 }
 
 function showPage(pageId){
@@ -298,7 +338,7 @@ function showPage(pageId){
   document.getElementById(pageId).classList.add("active");
 }
 
-function createAccount(){
+async function createAccount(){
   const nom = document.getElementById("regNom").value.trim();
   const prenom = document.getElementById("regPrenom").value.trim();
   const matricule = document.getElementById("regMatricule").value.trim();
@@ -310,21 +350,23 @@ function createAccount(){
     return;
   }
 
+  await loadData();
+
   if(users.find(u => u.matricule === matricule)){
     alert("Ce matricule existe déjà.");
     return;
   }
 
-  if(users.find(u => u.discordId === discordId)){
+  if(users.find(u => u.discord_id === discordId)){
     alert("Cet ID Discord est déjà utilisé.");
     return;
   }
 
-  users.push({
+  const { error } = await db.from("users").insert({
     nom,
     prenom,
     matricule,
-    discordId,
+    discord_id: discordId,
     password,
     accepted:false,
     admin:false,
@@ -332,12 +374,17 @@ function createAccount(){
     unit:"available"
   });
 
-  saveData();
+  if(error){
+    alert("Erreur création compte : " + error.message);
+    return;
+  }
+
   alert("Compte créé. Il doit être accepté par un admin.");
   showPage("loginPage");
 }
+async function login(){
+  await loadData();
 
-function login(){
   const matricule = document.getElementById("loginMatricule").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
 
@@ -388,7 +435,7 @@ function renderAdmin(){
 
       div.innerHTML = `
         <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong><br>
-        ID Discord : ${user.discordId || "Non renseigné"}<br><br>
+        ID Discord : ${user.discord_id || "Non renseigné"}<br><br>
         <button class="green" onclick="acceptUser('${user.matricule}')">Accepter</button>
         <button class="red" onclick="deleteUser('${user.matricule}')">Refuser</button>
       `;
@@ -403,7 +450,7 @@ function renderAdmin(){
 
     div.innerHTML = `
       <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong><br>
-      ID Discord : ${user.discordId || "Non renseigné"}<br>
+      ID Discord : ${user.discord_id || "Non renseigné"}<br>
       Admin : ${user.admin ? "Oui" : "Non"}<br>
       Accepté : ${user.accepted ? "Oui" : "Non"}<br><br>
 
@@ -416,57 +463,79 @@ function renderAdmin(){
   });
 }
 
-function acceptUser(matricule){
-  const user = users.find(u => u.matricule === matricule);
+async function acceptUser(matricule){
+  const { error } = await db.from("users")
+    .update({ accepted:true })
+    .eq("matricule", matricule);
 
-  if(user){
-    user.accepted = true;
-    saveData();
-    renderAdmin();
+  if(error){
+    alert("Erreur acceptation : " + error.message);
+    return;
   }
-}
 
-function deleteUser(matricule){
-  users = users.filter(u => u.matricule !== matricule);
-  saveData();
+  await loadData();
   renderAdmin();
 }
+async function deleteUser(matricule){
+  const { error } = await db.from("users").delete().eq("matricule", matricule);
 
-function deleteAccount(matricule){
+  if(error){
+    alert("Erreur suppression : " + error.message);
+    return;
+  }
+
+  await loadData();
+  renderAdmin();
+}
+async function deleteAccount(matricule){
   const user = users.find(u => u.matricule === matricule);
 
   if(!user) return;
 
   if(!confirm("Supprimer " + user.prenom + " " + user.nom + " ?")) return;
 
-  users = users.filter(u => u.matricule !== matricule);
-  saveData();
-  renderAdmin();
-}
+  const { error } = await db.from("users").delete().eq("matricule", matricule);
 
-function toggleService(){
-  currentUser.service = !currentUser.service;
-
-  if(currentUser.service){
-    currentUser.unit = "available";
-    document.getElementById("serviceBtn").innerText = "Terminer son service";
-  } else {
-    currentUser.unit = null;
-    document.getElementById("serviceBtn").innerText = "Prendre son service";
+  if(error){
+    alert("Erreur suppression : " + error.message);
+    return;
   }
 
-  saveData();
+  await loadData();
+  renderAdmin();
+}
+async function toggleService(){
+  currentUser.service = !currentUser.service;
+
+  const updateData = currentUser.service
+    ? { service:true, unit:"available" }
+    : { service:false, unit:null };
+
+  const { error } = await db.from("users")
+    .update(updateData)
+    .eq("matricule", currentUser.matricule);
+
+  if(error){
+    alert("Erreur service : " + error.message);
+    return;
+  }
+
+  await loadData();
+  currentUser = users.find(u => u.matricule === currentUser.matricule);
+
+  document.getElementById("serviceBtn").innerText =
+    currentUser.service ? "Terminer son service" : "Prendre son service";
+
   renderBoard();
 }
-
-function createUnit(){
+async function createUnit(){
   const name = prompt("Nom de l'unité :");
   if(!name) return;
 
   const radio = prompt("Fréquence radio :", "Fréquence 1") || "";
   const weapon = prompt("Armements séparés par des virgules :", "Arme de poing") || "";
 
-  units.push({
+  const { error } = await db.from("units").insert({
     id:"unit_" + Date.now(),
     name:name,
     status:"10-8",
@@ -474,21 +543,28 @@ function createUnit(){
     weapon:weapon
   });
 
-  saveData();
+  if(error){
+    alert("Erreur création unité : " + error.message);
+    return;
+  }
+
+  await loadData();
   renderBoard();
 }
+async function changeUnitStatus(unitId, status){
+  const { error } = await db.from("units")
+    .update({ status })
+    .eq("id", unitId);
 
-function changeUnitStatus(unitId, status){
-  const unit = units.find(u => u.id === unitId);
-
-  if(unit){
-    unit.status = status;
-    saveData();
-    renderBoard();
+  if(error){
+    alert("Erreur statut : " + error.message);
+    return;
   }
-}
 
-function editUnitInfo(unitId){
+  await loadData();
+  renderBoard();
+}
+async function editUnitInfo(unitId){
   const unit = units.find(u => u.id === unitId);
   if(!unit) return;
 
@@ -498,32 +574,37 @@ function editUnitInfo(unitId){
   const weapon = prompt("Armements séparés par des virgules :", unit.weapon || "");
   if(weapon === null) return;
 
-  unit.radio = radio;
-  unit.weapon = weapon;
+  const { error } = await db.from("units")
+    .update({ radio, weapon })
+    .eq("id", unitId);
 
-  saveData();
+  if(error){
+    alert("Erreur modification unité : " + error.message);
+    return;
+  }
+
+  await loadData();
   renderBoard();
 }
-
-function deleteUnitButton(unitId){
+async function deleteUnitButton(unitId){
   const unit = units.find(u => u.id === unitId);
 
   if(!unit) return;
 
   if(!confirm("Supprimer l'unité " + unit.name + " ?")) return;
 
-  users.forEach(user => {
-    if(user.unit === unitId){
-      user.unit = "available";
-    }
-  });
+  await db.from("users").update({ unit:"available" }).eq("unit", unitId);
 
-  units = units.filter(u => u.id !== unitId);
+  const { error } = await db.from("units").delete().eq("id", unitId);
 
-  saveData();
+  if(error){
+    alert("Erreur suppression unité : " + error.message);
+    return;
+  }
+
+  await loadData();
   renderBoard();
 }
-
 function renderBoard(){
   const board = document.getElementById("board");
 
@@ -622,23 +703,50 @@ function allowDrop(event){
   event.preventDefault();
 }
 
-function dropOfficer(event, unitId){
+async function dropOfficer(event, unitId){
   event.preventDefault();
 
   const matricule = event.dataTransfer.getData("matricule");
-  const user = users.find(u => u.matricule === matricule);
 
-  if(user){
-    user.unit = unitId;
-    saveData();
-    renderBoard();
+  const { error } = await db.from("users")
+    .update({ unit:unitId })
+    .eq("matricule", matricule);
+
+  if(error){
+    alert("Erreur déplacement : " + error.message);
+    return;
   }
-}
 
+  await loadData();
+  renderBoard();
+}
 function logout(){
   currentUser = null;
   showPage("loginPage");
 }
+
+db.channel("mdt-sync")
+  .on("postgres_changes", { event:"*", schema:"public", table:"users" }, async () => {
+    await loadData();
+
+    if(currentUser){
+      const updatedUser = users.find(u => u.matricule === currentUser.matricule);
+      if(updatedUser) currentUser = updatedUser;
+
+      if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
+      if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
+    }
+  })
+  .on("postgres_changes", { event:"*", schema:"public", table:"units" }, async () => {
+    await loadData();
+
+    if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
+    if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
+  })
+  .subscribe();
+
+loadData();
+
 </script>
 
 </body>
