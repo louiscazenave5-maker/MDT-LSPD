@@ -252,30 +252,9 @@ button:hover{opacity:.85}
   <div class="board" id="board"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-db.channel("mdt-sync")
-  .on("postgres_changes", { event:"*", schema:"public", table:"users" }, async () => {
-    await loadData();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    if(currentUser){
-      const updatedUser = users.find(u => u.matricule === currentUser.matricule);
-      if(updatedUser) currentUser = updatedUser;
 
-      if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
-      if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
-    }
-  })
-  .on("postgres_changes", { event:"*", schema:"public", table:"units" }, async () => {
-    await loadData();
-
-    if(document.getElementById("mdtPage").classList.contains("active")) renderBoard();
-    if(document.getElementById("adminPage").classList.contains("active")) renderAdmin();
-  })
-  .subscribe();
-
-loadData();
-
-</script>
 
 <script>
 const SUPABASE_URL = "https://ytdpmoscnhoqcjhmpmue.supabase.co";
