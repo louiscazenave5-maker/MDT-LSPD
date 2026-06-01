@@ -3,30 +3,198 @@
 <head>
 <meta charset="UTF-8">
 <title>MDT LSPD</title>
+
 <style>
-body{margin:0;background:#0f172a;color:white;font-family:Arial}
+body{
+  margin:0;
+  background:#0f172a;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+
 .page{display:none}
 .page.active{display:block}
-.center-page{min-height:100vh;display:flex;justify-content:center;align-items:center}
-.login-box{background:#1e293b;padding:35px;border-radius:18px;width:360px;text-align:center}
+
+.center-page{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-box{
+  background:#1e293b;
+  padding:35px;
+  border-radius:18px;
+  width:360px;
+  text-align:center;
+}
+
 .login-box input{width:90%}
-input,button,select{padding:12px;margin:6px;border-radius:8px;border:none}
-button{background:#2563eb;color:white;cursor:pointer}
+
+input,button,select{
+  padding:12px;
+  margin:6px;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
 button:hover{opacity:.85}
+
 .red{background:#dc2626}
 .green{background:#16a34a}
-.board{display:flex;gap:15px;overflow-x:auto;padding:20px}
-.column{background:#1e293b;min-width:280px;padding:15px;border-radius:12px}
-.card{background:#334155;padding:12px;border-radius:10px;margin:10px}
-.officer{background:#334155;padding:7px 9px;border-radius:8px;margin:6px 0;cursor:grab;font-size:13px}
-.patrol-card{background:#334155;padding:12px;border-radius:10px;margin:10px 0;cursor:grab}
-.topbar{padding:20px;background:#111827}
-.unit-title{cursor:pointer;user-select:none}
-.unit-title:hover{color:#93c5fd}
+
+.topbar{
+  padding:20px;
+  background:#111827;
+}
+
+.board{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  padding:20px;
+}
+
+.column{
+  background:#1e293b;
+  min-width:300px;
+  padding:15px;
+  border-radius:12px;
+}
+
+.available-column{
+  background:#111827;
+  border:2px dashed #2563eb;
+}
+
+.card{
+  background:#334155;
+  padding:12px;
+  border-radius:10px;
+  margin:10px;
+}
+
+.officer{
+  background:#334155;
+  padding:8px 10px;
+  border-radius:8px;
+  margin:6px 0;
+  cursor:grab;
+  font-size:13px;
+}
+
+.patrol-card{
+  background:#334155;
+  padding:12px;
+  border-radius:10px;
+  margin:10px 0;
+  cursor:grab;
+}
+
+.unit-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.unit-title{
+  cursor:pointer;
+  user-select:none;
+  margin:0;
+}
+
+.unit-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.unit-status-select{
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  width:auto;
+}
+
+.delete-unit-btn{
+  background:#dc2626;
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.edit-unit-btn{
+  background:#475569;
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.unit-info{
+  margin:4px 0 12px 0;
+}
+
+.radio-badge{
+  display:inline-block;
+  background:#8b4a4a;
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  padding:3px 7px;
+  border-radius:4px;
+  margin-bottom:5px;
+  line-height:1.2;
+}
+
+.weapon-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-top:2px;
+  margin-bottom:8px;
+}
+
+.weapon-badge{
+  display:inline-block;
+  background:#8a7a3b;
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  padding:3px 7px;
+  border-radius:4px;
+  line-height:1.2;
+}
+
+.footer-credit{
+  position:fixed;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,0.25);
+  font-size:12px;
+  user-select:none;
+  pointer-events:none;
+}
 </style>
 </head>
 
 <body>
+
+  <div class="footer-credit">
+  By SkyTrax
+</div>
 
 <div id="loginPage" class="page active">
   <div class="center-page">
@@ -48,8 +216,8 @@ button:hover{opacity:.85}
       <input id="regNom" placeholder="Nom">
       <input id="regPrenom" placeholder="Prénom">
       <input id="regMatricule" placeholder="Matricule">
-      <input id="regPassword" type="password" placeholder="Mot de passe">
       <input id="regDiscordId" placeholder="ID Discord">
+      <input id="regPassword" type="password" placeholder="Mot de passe">
       <br>
       <button onclick="createAccount()">Créer le compte</button>
       <button onclick="showPage('loginPage')">Retour</button>
@@ -62,9 +230,11 @@ button:hover{opacity:.85}
     <h1>Panel Admin</h1>
     <button class="red" onclick="logout()">Déconnexion</button>
   </div>
+
   <div style="padding:20px">
     <h2>Comptes en attente</h2>
     <div id="pendingList"></div>
+
     <h2>Tous les comptes</h2>
     <div id="allUsersList"></div>
   </div>
@@ -88,8 +258,8 @@ const DEFAULT_USERS = [
     nom:"Williams",
     prenom:"Javier",
     matricule:"97",
-    password:"Fortnite34",
     discordId:"123456789012345678",
+    password:"Fortnite34",
     accepted:true,
     admin:false,
     service:false,
@@ -99,8 +269,8 @@ const DEFAULT_USERS = [
     nom:"Admin",
     prenom:"MDT",
     matricule:"admin",
+    discordId:"000000000000000000",
     password:"admin123",
-    discordId:"123456789012345678",
     accepted:true,
     admin:true,
     service:false,
@@ -128,44 +298,44 @@ function showPage(pageId){
   document.getElementById(pageId).classList.add("active");
 }
 
-  function createAccount(){
-    const nom = document.getElementById("regNom").value.trim();
-    const prenom = document.getElementById("regPrenom").value.trim();
-    const matricule = document.getElementById("regMatricule").value.trim();
-    const discordId = document.getElementById("regDiscordId").value.trim();
-    const password = document.getElementById("regPassword").value.trim();
+function createAccount(){
+  const nom = document.getElementById("regNom").value.trim();
+  const prenom = document.getElementById("regPrenom").value.trim();
+  const matricule = document.getElementById("regMatricule").value.trim();
+  const discordId = document.getElementById("regDiscordId").value.trim();
+  const password = document.getElementById("regPassword").value.trim();
 
-    if(!nom || !prenom || !matricule || !discordId || !password){
-      alert("Remplis tous les champs.");
-      return;
-    }
-
-    if(users.find(u => u.matricule === matricule)){
-      alert("Ce matricule existe déjà.");
-      return;
-    }
-
-    if(users.find(u => u.discordId === discordId)){
-      alert("Cet ID Discord est déjà utilisé.");
-      return;
-    }
-
-    users.push({
-      nom,
-      prenom,
-      matricule,
-      discordId,
-      password,
-      accepted:false,
-      admin:false,
-      service:false,
-      unit:"available"
-    });
-
-    saveData();
-    alert("Compte créé. Il doit être accepté par un admin.");
-    showPage("loginPage");
+  if(!nom || !prenom || !matricule || !discordId || !password){
+    alert("Remplis tous les champs.");
+    return;
   }
+
+  if(users.find(u => u.matricule === matricule)){
+    alert("Ce matricule existe déjà.");
+    return;
+  }
+
+  if(users.find(u => u.discordId === discordId)){
+    alert("Cet ID Discord est déjà utilisé.");
+    return;
+  }
+
+  users.push({
+    nom,
+    prenom,
+    matricule,
+    discordId,
+    password,
+    accepted:false,
+    admin:false,
+    service:false,
+    unit:"available"
+  });
+
+  saveData();
+  alert("Compte créé. Il doit être accepté par un admin.");
+  showPage("loginPage");
+}
 
 function login(){
   const matricule = document.getElementById("loginMatricule").value.trim();
@@ -192,60 +362,63 @@ function login(){
     document.getElementById("welcome").innerText =
       `Bienvenue ${user.matricule} | ${user.prenom} ${user.nom}`;
 
+    document.getElementById("serviceBtn").innerText =
+      currentUser.service ? "Terminer son service" : "Prendre son service";
+
     renderBoard();
     showPage("mdtPage");
   }
 }
 
-  function renderAdmin(){
-    const pendingList = document.getElementById("pendingList");
-    const allUsersList = document.getElementById("allUsersList");
+function renderAdmin(){
+  const pendingList = document.getElementById("pendingList");
+  const allUsersList = document.getElementById("allUsersList");
 
-    pendingList.innerHTML = "";
-    allUsersList.innerHTML = "";
+  pendingList.innerHTML = "";
+  allUsersList.innerHTML = "";
 
-    const pending = users.filter(u => !u.accepted);
+  const pending = users.filter(u => !u.accepted);
 
-    if(pending.length === 0){
-      pendingList.innerHTML = "<p>Aucun compte en attente.</p>";
-    } else {
-      pending.forEach(user => {
-        const div = document.createElement("div");
-        div.className = "card";
-
-        div.innerHTML = `
-          <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong><br><br>
-          <button class="green" onclick="acceptUser('${user.matricule}')">Accepter</button>
-          <button class="red" onclick="deleteUser('${user.matricule}')">Refuser</button>
-        `;
-
-        pendingList.appendChild(div);
-      });
-    }
-
-    users.forEach(user => {
+  if(pending.length === 0){
+    pendingList.innerHTML = "<p>Aucun compte en attente.</p>";
+  } else {
+    pending.forEach(user => {
       const div = document.createElement("div");
       div.className = "card";
 
       div.innerHTML = `
         <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong><br>
-ID Discord : ${user.discordId || "Non renseigné"}<br>
-Admin : ${user.admin ? "Oui" : "Non"}<br>
-        Accepté : ${user.accepted ? "Oui" : "Non"}<br><br>
-
-        ${user.admin ? "" : `
-          <button class="red" onclick="deleteAccount('${user.matricule}')">
-            Supprimer
-          </button>
-        `}
+        ID Discord : ${user.discordId || "Non renseigné"}<br><br>
+        <button class="green" onclick="acceptUser('${user.matricule}')">Accepter</button>
+        <button class="red" onclick="deleteUser('${user.matricule}')">Refuser</button>
       `;
 
-      allUsersList.appendChild(div);
+      pendingList.appendChild(div);
     });
   }
 
+  users.forEach(user => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong><br>
+      ID Discord : ${user.discordId || "Non renseigné"}<br>
+      Admin : ${user.admin ? "Oui" : "Non"}<br>
+      Accepté : ${user.accepted ? "Oui" : "Non"}<br><br>
+
+      ${user.admin ? "" : `
+        <button class="red" onclick="deleteAccount('${user.matricule}')">Supprimer</button>
+      `}
+    `;
+
+    allUsersList.appendChild(div);
+  });
+}
+
 function acceptUser(matricule){
   const user = users.find(u => u.matricule === matricule);
+
   if(user){
     user.accepted = true;
     saveData();
@@ -257,22 +430,20 @@ function deleteUser(matricule){
   users = users.filter(u => u.matricule !== matricule);
   saveData();
   renderAdmin();
-} 
-  
-  function deleteAccount(matricule){
-    const user = users.find(u => u.matricule === matricule);
+}
 
-    if(!user) return;
+function deleteAccount(matricule){
+  const user = users.find(u => u.matricule === matricule);
 
-    if(!confirm("Supprimer " + user.prenom + " " + user.nom + " ?")){
-      return;
-    }
+  if(!user) return;
 
-    users = users.filter(u => u.matricule !== matricule);
+  if(!confirm("Supprimer " + user.prenom + " " + user.nom + " ?")) return;
 
-    saveData();
-    renderAdmin();
-  }
+  users = users.filter(u => u.matricule !== matricule);
+  saveData();
+  renderAdmin();
+}
+
 function toggleService(){
   currentUser.service = !currentUser.service;
 
@@ -292,10 +463,15 @@ function createUnit(){
   const name = prompt("Nom de l'unité :");
   if(!name) return;
 
+  const radio = prompt("Fréquence radio :", "Fréquence 1") || "";
+  const weapon = prompt("Armements séparés par des virgules :", "Arme de poing") || "";
+
   units.push({
     id:"unit_" + Date.now(),
     name:name,
-    status:"10-8"
+    status:"10-8",
+    radio:radio,
+    weapon:weapon
   });
 
   saveData();
@@ -308,20 +484,33 @@ function changeUnitStatus(unitId, status){
   if(unit){
     unit.status = status;
     saveData();
+    renderBoard();
   }
 }
 
-function deleteUnit(event, unitId){
-  event.preventDefault();
-
-  if(!event.altKey || event.button !== 2) return;
-
+function editUnitInfo(unitId){
   const unit = units.find(u => u.id === unitId);
   if(!unit) return;
 
-  const confirmDelete = confirm("Supprimer l'unité " + unit.name + " ?");
+  const radio = prompt("Fréquence radio :", unit.radio || "");
+  if(radio === null) return;
 
-  if(!confirmDelete) return;
+  const weapon = prompt("Armements séparés par des virgules :", unit.weapon || "");
+  if(weapon === null) return;
+
+  unit.radio = radio;
+  unit.weapon = weapon;
+
+  saveData();
+  renderBoard();
+}
+
+function deleteUnitButton(unitId){
+  const unit = units.find(u => u.id === unitId);
+
+  if(!unit) return;
+
+  if(!confirm("Supprimer l'unité " + unit.name + " ?")) return;
 
   users.forEach(user => {
     if(user.unit === unitId){
@@ -339,32 +528,67 @@ function renderBoard(){
   const board = document.getElementById("board");
 
   board.innerHTML = `
-    <div class="column" ondragover="allowDrop(event)" ondrop="dropOfficer(event,'available')">
-      <h2>Officiers disponibles</h2>
+    <div class="column available-column" ondragover="allowDrop(event)" ondrop="dropOfficer(event,'available')">
+      <h2>Effectifs non assignés</h2>
       <div id="available"></div>
     </div>
   `;
 
   units.forEach(unit => {
+    const weaponsHtml = (unit.weapon || "")
+      .split(",")
+      .filter(w => w.trim() !== "")
+      .map(w => `<span class="weapon-badge">${w.trim()}</span>`)
+      .join("");
+
     const column = document.createElement("div");
     column.className = "column";
     column.setAttribute("ondragover", "allowDrop(event)");
     column.setAttribute("ondrop", `dropOfficer(event,'${unit.id}')`);
 
     column.innerHTML = `
-      <h2 class="unit-title" oncontextmenu="deleteUnit(event, '${unit.id}')" title="Alt + clic droit pour supprimer">
-        ${unit.name}
-      </h2>
+      <div class="unit-header">
+        <h2 class="unit-title">${unit.name}</h2>
 
-      <select onchange="changeUnitStatus('${unit.id}', this.value)">
-        <option ${unit.status==="10-8" ? "selected" : ""}>10-8</option>
-        <option ${unit.status==="10-38" ? "selected" : ""}>10-38</option>
-        <option ${unit.status==="10-80" ? "selected" : ""}>10-80</option>
-        <option ${unit.status==="10-99" ? "selected" : ""}>10-99</option>
-        <option ${unit.status==="Transport" ? "selected" : ""}>Transport</option>
-        <option ${unit.status==="Pause" ? "selected" : ""}>Pause</option>
-        <option ${unit.status==="Indisponible" ? "selected" : ""}>Indisponible</option>
-      </select>
+        <div class="unit-actions">
+          <select class="unit-status-select" onchange="changeUnitStatus('${unit.id}', this.value)">
+            <option ${unit.status==="10-6" ? "selected" : ""}>10-6</option>
+            <option ${unit.status==="10-7" ? "selected" : ""}>10-7</option>
+            <option ${unit.status==="10-14" ? "selected" : ""}>10-14</option>
+            <option ${unit.status==="10-15" ? "selected" : ""}>10-15</option>
+            <option ${unit.status==="10-17" ? "selected" : ""}>10-17</option>
+            <option ${unit.status==="10-23" ? "selected" : ""}>10-23</option>
+            <option ${unit.status==="10-31" ? "selected" : ""}>10-31</option>
+            <option ${unit.status==="10-35" ? "selected" : ""}>10-35</option>
+            <option ${unit.status==="10-37" ? "selected" : ""}>10-37</option>
+            <option ${unit.status==="10-38" ? "selected" : ""}>10-38</option>
+            <option ${unit.status==="10-40" ? "selected" : ""}>10-40</option>
+            <option ${unit.status==="10-50" ? "selected" : ""}>10-50</option>
+            <option ${unit.status==="10-51" ? "selected" : ""}>10-51</option>
+            <option ${unit.status==="10-52" ? "selected" : ""}>10-52</option>
+            <option ${unit.status==="10-56" ? "selected" : ""}>10-56</option>
+            <option ${unit.status==="10-59" ? "selected" : ""}>10-59</option>
+            <option ${unit.status==="10-60" ? "selected" : ""}>10-60</option>
+            <option ${unit.status==="10-91" ? "selected" : ""}>10-91</option>
+            <option ${unit.status==="10-92" ? "selected" : ""}>10-92</option>
+            <option ${unit.status==="10-97" ? "selected" : ""}>10-97</option>
+            <option ${unit.status==="10-98" ? "selected" : ""}>10-98</option>
+            <option ${unit.status==="10-99" ? "selected" : ""}>10-99</option>
+
+          </select>
+
+          <button class="edit-unit-btn" onclick="editUnitInfo('${unit.id}')">✎</button>
+          <button class="delete-unit-btn" onclick="deleteUnitButton('${unit.id}')">✕</button>
+        </div>
+      </div>
+
+      <div class="unit-info">
+        <div class="radio-badge">${unit.radio || "Aucune fréquence"}</div>
+
+        <div class="weapon-container">
+          ${weaponsHtml || `<span class="weapon-badge">Aucun armement</span>`}
+        </div>
+      </div>
 
       <div id="${unit.id}"></div>
     `;
@@ -374,24 +598,23 @@ function renderBoard(){
 
   users.filter(u => u.service).forEach(user => {
     const card = document.createElement("div");
-
     card.draggable = true;
+
     card.ondragstart = function(event){
       event.dataTransfer.setData("matricule", user.matricule);
     };
 
-    if(user.unit === "available"){
-      card.className = "officer";
-    } else {
-      card.className = "patrol-card";
-    }
+    card.className = user.unit === "available" ? "officer" : "patrol-card";
 
     card.innerHTML = `
       <strong>${user.matricule} | ${user.prenom} ${user.nom}</strong>
     `;
 
     const container = document.getElementById(user.unit || "available");
-    if(container) container.appendChild(card);
+
+    if(container){
+      container.appendChild(card);
+    }
   });
 }
 
@@ -411,22 +634,6 @@ function dropOfficer(event, unitId){
     renderBoard();
   }
 }
-
-  function deleteAccount(matricule){
-
-    const user = users.find(u => u.matricule === matricule);
-
-    if(!user) return;
-
-    if(!confirm("Supprimer " + user.prenom + " " + user.nom + " ?"))
-      return;
-
-    users = users.filter(u => u.matricule !== matricule);
-
-    saveData();
-    renderAdmin();
-
-  }
 
 function logout(){
   currentUser = null;
