@@ -534,7 +534,6 @@ async function createUnit(){
     id:"unit_" + Date.now(),
     name:name,
     status:"10-8",
-    patrouille:patrouille,
     radio:radio,
     vehicle:vehicle,
     weapon:weapon
@@ -565,8 +564,7 @@ async function editUnitInfo(unitId){
   const unit = units.find(u => u.id === unitId);
   if(!unit) return;
 
-    const name = prompt(
-    "Nom de la patrouille :",unit.patrouille || "");
+  const name = prompt("Nom de la patrouille :", unit.name || "");
   if(name === null) return;
 
   const radio = prompt("Fréquence radio :", unit.radio || "");
@@ -579,7 +577,12 @@ async function editUnitInfo(unitId){
   if(weapon === null) return;
 
   const { error } = await db.from("units")
-    .update({ radio, vehicle, weapon })
+    .update({
+      name: name,
+      radio: radio,
+      vehicle: vehicle,
+      weapon: weapon
+    })
     .eq("id", unitId);
 
   if(error){
