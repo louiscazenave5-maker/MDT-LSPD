@@ -561,6 +561,10 @@ async function editUnitInfo(unitId){
   const unit = units.find(u => u.id === unitId);
   if(!unit) return;
 
+    const name = prompt(
+    "Nom de la patrouille :",unit.name || "");
+  if(name === null) return;
+
   const radio = prompt("Fréquence radio :", unit.radio || "");
   if(radio === null) return;
 
