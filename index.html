@@ -421,11 +421,16 @@ button:hover{
 
 .board{
   display:grid;
-  grid-template-columns:360px repeat(auto-fill,minmax(340px,340px));
+  grid-template-columns:340px 1fr;
+  gap:16px;
   align-items:start;
-  gap:20px;
-  padding:0;
-  overflow-x:hidden;
+}
+
+.units-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+  gap:16px;
+  align-items:start;
 }
 
 .column{
@@ -1204,12 +1209,14 @@ function renderBoard(){
   updateDashboardStats();
   const board = document.getElementById("board");
 
-  board.innerHTML = `
-    <div class="column available-column" ondragover="allowDrop(event)" ondrop="dropOfficer(event,'available')">
-      <h2>Effectifs non assignés</h2>
-      <div id="available"></div>
-    </div>
-  `;
+ board.innerHTML = `
+  <div class="column available-column" ondragover="allowDrop(event)" ondrop="dropOfficer(event,'available')">
+    <h2>Effectifs non assignés</h2>
+    <div id="available"></div>
+  </div>
+
+  <div class="units-grid" id="unitsGrid"></div>
+`;
 
   units.forEach(unit => {
     const weaponsHtml = (unit.weapon || "")
@@ -1276,9 +1283,7 @@ function renderBoard(){
       <div id="${unit.id}"></div>
     `;
 
-    board.appendChild(column);
-  });
-
+    document.getElementById("unitsGrid").appendChild(column);
   users.filter(u => u.service).forEach(user => {
     const card = document.createElement("div");
     card.draggable = true;
@@ -1426,6 +1431,24 @@ db.channel("panic-sync")
     }
   )
   .subscribe();
+
+  // Débloque l'audio après le premier clic utilisateur
+document.addEventListener("click", () => {
+  const sound = document.getElementById("panicSound");
+
+  sound.volume = 0;
+
+  sound.play()
+    .then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+      sound.volume = 1;
+    })
+    .catch(()=>{});
+
+}, { once:true });
+
+loadData();
 
 loadData();
 </script>
