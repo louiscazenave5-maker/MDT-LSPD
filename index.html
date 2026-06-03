@@ -30,6 +30,16 @@ body{
   font-family:Arial,sans-serif;
 }
 
+  .footer-credit{
+  position:fixed;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,0.25);
+  font-size:12px;
+  text-decoration:underline;
+}
+
 .page{display:none}
 .page.active{display:block}
 
@@ -728,7 +738,7 @@ button:hover{
 
 <body>
 <audio id="panicSound" src="panic.mp3"></audio>
-<div class="footer-credit"><u>By SkyTrax</u></div>
+<div class="footer-credit">By SkyTrax</div>
 
 <div id="loginPage" class="page active">
   <div class="secure-login-page">
