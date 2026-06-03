@@ -335,7 +335,7 @@ button:hover{
 }
 
 #mdtPage .title-block h1::before{
-  content:"🛡️";
+  content:"✪";
   width:38px;
   height:38px;
   border-radius:13px;
@@ -722,7 +722,7 @@ button:hover{
 <div id="loginPage" class="page active">
   <div class="secure-login-page">
     <div class="login-left">
-      <div class="badge-icon">🛡️</div>
+      <div class="badge-icon">✪</div>
       <h1>LSPD</h1>
       <p class="terminal-subtitle">POLICE DATA TERMINAL</p>
       <div class="login-line"></div>
@@ -746,7 +746,7 @@ button:hover{
     </div>
 
     <div class="secure-box">
-      <div class="secure-icon">🛡️</div>
+      <div class="secure-icon">✪</div>
       <h2>Connexion sécurisée</h2>
       <p class="secure-desc">Accès réservé au personnel LSPD</p>
 
@@ -771,7 +771,7 @@ button:hover{
 <div id="registerPage" class="page">
   <div class="secure-login-page">
     <div class="register-box">
-      <div class="secure-icon">🛡️</div>
+      <div class="secure-icon">✪</div>
       <h1>Créer un compte LSPD</h1>
 
       <label for="regNom">Nom</label>
@@ -793,7 +793,7 @@ button:hover{
 
 <div id="adminPage" class="page">
   <div class="topbar">
-    <h1>🛡️ Panel Admin LSPD</h1>
+    <h1>Panel Admin LSPD</h1>
     <button class="red" onclick="logout()">Déconnexion</button>
   </div>
 
@@ -1172,7 +1172,7 @@ async function deleteUnitButton(unitId){
 
 function updateDashboardStats(){
   const service = users.filter(u => u.service).length;
-  const available = units.filter(u => u.status === "10-8").length;
+  const available = units.filter( u => u.status === "10-8" || u.status === "10-98").length;
   const unitCount = units.length;
   const priorityStatuses = ["10-31","10-35","10-37","10-38","10-40","10-50","10-51","10-52","10-56","10-59","10-60","10-91","10-92","10-99"];
   const priority = units.filter(u => priorityStatuses.includes(u.status)).length;
