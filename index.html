@@ -638,11 +638,9 @@ button:hover{
 /* ===== FIX CARTES PATROUILLES COMPACTES SANS EMOJIS ===== */
 .board{
   display:grid;
-  grid-template-columns:340px repeat(auto-fill, minmax(330px, 330px));
-  align-items:start;
+  grid-template-columns:340px repeat(auto-fit,minmax(320px,1fr));
   gap:16px;
-  padding:0;
-  overflow-x:hidden;
+  align-items:start;
 }
 
 .column{
@@ -1404,9 +1402,29 @@ db.channel("mdt-sync")
 
 
 db.channel("panic-sync")
-  .on("postgres_changes", { event:"INSERT", schema:"public", table:"panic_alerts" }, payload => {
-    showPanicPopup(payload.new);
-  })
+  .on(
+    "postgres_changes",
+    {
+      event:"INSERT",
+      schema:"public",
+      table:"panic_alerts"
+    },
+    payload => {
+
+      showPanicPopup(payload.new);
+
+      const sound = document.getElementById("panicSound");
+
+      if(sound){
+        sound.pause();
+        sound.currentTime = 0;
+
+        sound.play().catch(err=>{
+          console.log("Lecture bloquée :", err);
+        });
+      }
+    }
+  )
   .subscribe();
 
 loadData();
