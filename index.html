@@ -506,20 +506,34 @@ button:hover{
 
 .unit-info{margin:4px 0 14px 0}
 
-.radio-badge,.weapon-badge,.vehicle-badge{
-  display:inline-block;
-  color:white;
-  font-size:11px;
-  font-weight:900;
-  padding:4px 7px;
-  border-radius:7px;
-  margin:0 4px 6px 0;
-  line-height:1.2;
+.radio-badge,
+.vehicle-badge,
+.weapon-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 8px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:700;
+    margin:2px 4px 2px 0;
+    border:none;
+    box-shadow:none;
 }
 
-.radio-badge{background:#1d4ed8}
-.vehicle-badge{background:#15803d}
-.weapon-badge{background:#854d0e}
+.radio-badge{
+    background:#1d4ed8;
+    color:white;
+}
+
+.vehicle-badge{
+    background:#16a34a;
+    color:white;
+}
+
+.weapon-badge{
+    background:#b45309;
+    color:white;
+}
 
 .weapon-container{
   display:flex;
